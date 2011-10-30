@@ -1,5 +1,7 @@
 from string import Template
 
+K = 48
+
 def method_1():
     template = """\
         // Iteration $iteration1
@@ -18,7 +20,7 @@ def method_1():
     t = Template(template.strip())
     #print t.substitute(x='X0', y='Y0', a='A0')
     iteration = 0
-    for i in range(0, 48, 10):
+    for i in range(0, K, 10):
         for j in range(0, 5, 2):
             print ' '*8 + t.substitute(
                     iteration1=iteration+1,
@@ -32,9 +34,11 @@ def method_1():
                     a='A0',
                     )
             iteration = iteration + 2
-            if iteration >= 22:
+            if iteration >= (K/2):
                 break
-            print
+            print ''
+        if iteration >= (K/2):
+            break
 
 
 if __name__=='__main__':
