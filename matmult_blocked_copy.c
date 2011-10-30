@@ -22,9 +22,9 @@
  *
  **/
 
-#define K_BLOCK_SIZE 64
-#define M_BLOCK_SIZE 64
-#define N_BLOCK_SIZE 64
+#define K_BLOCK_SIZE 48
+#define M_BLOCK_SIZE 48
+#define N_BLOCK_SIZE 48
 
 #define MIN(a, b) (a < b) ? a : b
 
