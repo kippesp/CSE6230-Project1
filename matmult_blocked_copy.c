@@ -27,6 +27,21 @@
 
 #define MIN(a, b) (a < b) ? a : b
 
+static void print_matrix(int rows, int cols, const double *mat) {
+
+  int r, c;
+
+  /* Iterate over the rows of the matrix */
+  for (r = 0; r < rows; r++) {
+    /* Iterate over the columns of the matrix */
+    for (c = 0; c < cols; c++) {
+      int index = (c * rows) + r;
+      fprintf(stderr, "%.0lf ", mat[index]);
+    } /* c */
+    fprintf(stderr, "\n");
+  } /* r */
+}
+
 /*
  * Additional optimizations to consider:
  *
@@ -56,26 +71,41 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
       C[c_index] = dotprod + C[c_index];
     }
   }
+
+  //puts("A_temp=");
+  //print_matrix(M, K, A_temp);
+
+  //puts("B_temp=");
+  //print_matrix(K, N, B_temp);
+
+  //puts("C=");
+  //print_matrix(M, N, C);
 }
 
 void
 dgemm_copy (const int lda, const int M, const int N, const int K, const double *A, const double *B, double *C)
 {
-  int i, j, k;
-  double A_temp[BLOCK_SIZE * BLOCK_SIZE];
-  double B_temp[BLOCK_SIZE * BLOCK_SIZE];
+  //puts("A=");
+  //print_matrix(M, K, A);
 
-  /* Copy matrix A into cache */
-  for (i = 0; i < K; i++) {
-    for (j = 0; j < M; j++) {
-      A_temp[i + j*K] = A[j + i*lda];
+  //puts("B=");
+  //print_matrix(K, N, B);
+
+  int i, j, k;
+  __declspec(align(16))double A_temp[BLOCK_SIZE * BLOCK_SIZE];
+  __declspec(align(16))double B_temp[BLOCK_SIZE * BLOCK_SIZE];
+
+  /* Copy and transpose matrix A into cache */
+  for (k = 0; k < K; k++) {
+    for (i = 0; i < M; i++) {
+      A_temp[k + i*K] = A[i + k*lda];
     }
   }
 
   /* Copy matrix B into cache */
-  for (i = 0; i < N; i++) {
-    for (j = 0; j < K; j++) {
-      B_temp[j + i*K] = B[j + i*lda];
+  for (j = 0; j < N; j++) {
+    for (k = 0; k < K; k++) {
+      B_temp[k + j*K] = B[k + j*lda];
     }
   }
 
