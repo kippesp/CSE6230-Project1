@@ -1,0 +1,31 @@
+Adding user pkippes3 to group authjobs
+Tue Nov  1 18:33:16 EDT 2011
+jinx6
+/nethome/pkippes3/projects/cse6230/part_d-me
+
+
+
+
+
+**Validating matmult**
+	Validating n=16.....pass
+	Validating n=64.....pass
+	Validating n=128.....pass
+	Validating n=512.....pass
+
+
+**Timing matmult**
+	n=1024: 15.820716 gflops/s
+	n=2048: 33.616435 gflops/s
+	n=4096: 33.585728 gflops/s
+	n=5120: 35.478996 gflops/s
+
+	n=1024: 27.796313 gflops/s
+	n=2048: 33.757778 gflops/s
+	n=4096: 33.640714 gflops/s
+	n=5120: 35.201914 gflops/s
+
+
+
+Average Performance: 31.112324 gflops/s
+Removing user pkippes3 from group authjobs
