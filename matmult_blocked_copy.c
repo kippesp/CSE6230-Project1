@@ -60,7 +60,7 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
 
   for (i = 0; i < M; i++) {
     for (j = 0; j < N; j++) {
-      double dotprod = 0.0; /* Accumulates the sum of the dot-product */
+      register double dotprod = 0.0; /* Accumulates the sum of the dot-product */
       for (k = 0; k < K; k++) {
         int a_index, b_index;
         a_index = (i * K) + k; /* Compute index of A element */
