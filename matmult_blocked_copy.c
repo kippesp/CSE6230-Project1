@@ -57,39 +57,63 @@ void
 basic_dgemm (const int lda, const int M, const int N, const int K, const double *A, const double *B, double *C)
 {
   int i, j, k;
-  __m128d X0;
-  __m128d X1;
-  __m128d Y0;
-  __m128d Y1;
-  __m128d A0;
 
   for (i = 0; i < M; i++) {
     for (j = 0; j < N; j++) {
+      __m128d A0;
+
       A0 = _mm_setzero_pd();
 
-      for (k = 0; k < K; k = k+4)
+      for (k = 0; k < K; k = k+8)
       {
         int a_index, b_index;
+        __m128d X0;
+        __m128d X1;
+        __m128d X2;
+        __m128d X3;
+        __m128d Y0;
+        __m128d Y1;
+        __m128d Y2;
+        __m128d Y3;
+
         a_index = (i * K) + k;
         b_index = (j * K) + k;
 
         X0 = _mm_load_pd(&A[a_index]);
         X1 = _mm_load_pd(&A[a_index+2]);
+        X2 = _mm_load_pd(&A[a_index+4]);
+        X3 = _mm_load_pd(&A[a_index+6]);
         Y0 = _mm_load_pd(&B[b_index]);
         Y1 = _mm_load_pd(&B[b_index+2]);
+        Y2 = _mm_load_pd(&B[b_index+4]);
+        Y3 = _mm_load_pd(&B[b_index+6]);
 
         X0 = _mm_mul_pd(X0, Y0);
         X1 = _mm_mul_pd(X1, Y1);
 
         // Y0, Y1 are free
 
+        X2 = _mm_mul_pd(X2, Y2);
+        X3 = _mm_mul_pd(X3, Y3);
+
+        // Y2, Y3 are free
+
         A0 = _mm_add_pd(A0, X0);
         A0 = _mm_add_pd(A0, X1);
+        A0 = _mm_add_pd(A0, X2);
+        A0 = _mm_add_pd(A0, X3);
+
+        //
+        // X0, X1, X2, X3, Y0, Y1, Y2, Y3 are free
+        //
+
       }
       int c_index = (j * lda) + i;
       __declspec(align(16)) double prodResult[2];
+
+      A0 = _mm_hadd_pd(A0, A0);
       _mm_store_pd(prodResult, A0);
-      C[c_index] = prodResult[0] + prodResult[1] + C[c_index];
+      C[c_index] = prodResult[0] + C[c_index];
     }
   }
 
