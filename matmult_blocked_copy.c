@@ -98,7 +98,7 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
         X3 = _mm_mul_pd(X3, Y3);
         X4 = _mm_mul_pd(X4, Y4);
 
-        // Y0, Y1, Y2, Y3, Y4 are free
+        // registers freed
 
         A0 = _mm_add_pd(A0, X0);
         A0 = _mm_add_pd(A0, X1);
@@ -106,18 +106,20 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
         A0 = _mm_add_pd(A0, X3);
         A0 = _mm_add_pd(A0, X4);
 
-        // X0, X1, X2, X3, X4 are free
+        // registers freed
 
         X0 = _mm_load_pd(&A[a_index+12]);
         X1 = _mm_load_pd(&A[a_index+14]);
+        Y2 = _mm_load_pd(&A[a_index+10]);
         X2 = _mm_load_pd(&B[b_index+12]);
         X3 = _mm_load_pd(&B[b_index+14]);
-        Y2 = _mm_load_pd(&A[a_index+10]);
         Y3 = _mm_load_pd(&B[b_index+10]);
 
         X0 = _mm_mul_pd(X0, X2);
         X1 = _mm_mul_pd(X1, X3);
         Y2 = _mm_mul_pd(Y2, Y3);
+
+        // registers freed
 
         A0 = _mm_add_pd(A0, X0);
         A0 = _mm_add_pd(A0, X1);
