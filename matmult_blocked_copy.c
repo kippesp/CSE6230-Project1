@@ -82,21 +82,21 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
         b_index = (j * K) + k;
 
         X0 = _mm_load_pd(&A[a_index]);
-        X1 = _mm_load_pd(&A[a_index+2]);
-        X2 = _mm_load_pd(&A[a_index+4]);
-        X3 = _mm_load_pd(&A[a_index+6]);
-        X4 = _mm_load_pd(&A[a_index+8]);
         Y0 = _mm_load_pd(&B[b_index]);
+
+        X1 = _mm_load_pd(&A[a_index+2]);
         Y1 = _mm_load_pd(&B[b_index+2]);
+
+        X2 = _mm_load_pd(&A[a_index+4]);
         Y2 = _mm_load_pd(&B[b_index+4]);
+
+        X3 = _mm_load_pd(&A[a_index+6]);
         Y3 = _mm_load_pd(&B[b_index+6]);
-        Y4 = _mm_load_pd(&B[b_index+8]);
 
         X0 = _mm_mul_pd(X0, Y0);
         X1 = _mm_mul_pd(X1, Y1);
         X2 = _mm_mul_pd(X2, Y2);
         X3 = _mm_mul_pd(X3, Y3);
-        X4 = _mm_mul_pd(X4, Y4);
 
         // registers freed
 
@@ -104,26 +104,33 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
         A0 = _mm_add_pd(A0, X1);
         A0 = _mm_add_pd(A0, X2);
         A0 = _mm_add_pd(A0, X3);
-        A0 = _mm_add_pd(A0, X4);
 
         // registers freed
 
-        X0 = _mm_load_pd(&A[a_index+12]);
-        X1 = _mm_load_pd(&A[a_index+14]);
+        X4 = _mm_load_pd(&A[a_index+8]);
+        Y4 = _mm_load_pd(&B[b_index+8]);
+
         Y2 = _mm_load_pd(&A[a_index+10]);
-        X2 = _mm_load_pd(&B[b_index+12]);
-        X3 = _mm_load_pd(&B[b_index+14]);
         Y3 = _mm_load_pd(&B[b_index+10]);
 
+        X0 = _mm_load_pd(&A[a_index+12]);
+        X2 = _mm_load_pd(&B[b_index+12]);
+
+        X1 = _mm_load_pd(&A[a_index+14]);
+        X3 = _mm_load_pd(&B[b_index+14]);
+
+        X4 = _mm_mul_pd(X4, Y4);
+        Y2 = _mm_mul_pd(Y2, Y3);
         X0 = _mm_mul_pd(X0, X2);
         X1 = _mm_mul_pd(X1, X3);
-        Y2 = _mm_mul_pd(Y2, Y3);
 
         // registers freed
 
+        A0 = _mm_add_pd(A0, X4);
+        A0 = _mm_add_pd(A0, Y2);
         A0 = _mm_add_pd(A0, X0);
         A0 = _mm_add_pd(A0, X1);
-        A0 = _mm_add_pd(A0, Y2);
+
       }
       int c_index = (j * lda) + i;
       __declspec(align(16)) double prodResult[2];
