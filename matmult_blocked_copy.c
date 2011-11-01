@@ -21,9 +21,9 @@
  *
  **/
 
-#if !defined (BLOCK_SIZE)
-#define BLOCK_SIZE 64
-#endif
+#define K_BLOCK_SIZE 64
+#define M_BLOCK_SIZE 64
+#define N_BLOCK_SIZE 64
 
 #define MIN(a, b) (a < b) ? a : b
 
@@ -56,11 +56,10 @@ void
 basic_dgemm (const int lda, const int M, const int N, const int K, const double *A, const double *B, double *C)
 {
   int i, j, k;
-  int bs = BLOCK_SIZE;
 
   for (i = 0; i < M; i++) {
     for (j = 0; j < N; j++) {
-      register double dotprod = 0.0; /* Accumulates the sum of the dot-product */
+      double dotprod = 0.0; /* Accumulates the sum of the dot-product */
       for (k = 0; k < K; k++) {
         int a_index, b_index;
         a_index = (i * K) + k; /* Compute index of A element */
@@ -92,8 +91,8 @@ dgemm_copy (const int lda, const int M, const int N, const int K, const double *
   //print_matrix(K, N, B);
 
   int i, j, k;
-  __declspec(align(16))double A_temp[BLOCK_SIZE * BLOCK_SIZE];
-  __declspec(align(16))double B_temp[BLOCK_SIZE * BLOCK_SIZE];
+  __declspec(align(16))double A_temp[K_BLOCK_SIZE * M_BLOCK_SIZE];
+  __declspec(align(16))double B_temp[K_BLOCK_SIZE * N_BLOCK_SIZE];
 
   /* Copy and transpose matrix A into cache */
   for (k = 0; k < K; k++) {
@@ -118,14 +117,14 @@ matmult (const int lda, const double *A, const double *B, double *C)
   int i;
 
 #pragma omp parallel for shared (lda,A,B,C) private (i)
-  for (i = 0; i < lda; i += BLOCK_SIZE) {
+  for (i = 0; i < lda; i += M_BLOCK_SIZE) {
     int j;
-    for (j = 0; j < lda; j += BLOCK_SIZE) {
+    for (j = 0; j < lda; j += N_BLOCK_SIZE) {
       int k;
-      for (k = 0; k < lda; k += BLOCK_SIZE) {
-        int M = MIN (BLOCK_SIZE, lda-i);
-        int N = MIN (BLOCK_SIZE, lda-j);
-        int K = MIN (BLOCK_SIZE, lda-k);
+      for (k = 0; k < lda; k += K_BLOCK_SIZE) {
+        int M = MIN (M_BLOCK_SIZE, lda-i);
+        int N = MIN (N_BLOCK_SIZE, lda-j);
+        int K = MIN (K_BLOCK_SIZE, lda-k);
 
         dgemm_copy (lda, M, N, K, A+i+k*lda, B+k+j*lda, C+i+j*lda);
       }
