@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ia32intrin.h>
 
 #include "matmult.h"
 
@@ -56,18 +57,53 @@ void
 basic_dgemm (const int lda, const int M, const int N, const int K, const double *A, const double *B, double *C)
 {
   int i, j, k;
+  __m128d X0;
+  __m128d Y0;
+  //__m128d r4r5;
+  //__m128d r6r7;
+  __m128d A0;
+  __m128d A1;
+  //__m128d r10r11;
 
   for (i = 0; i < M; i++) {
     for (j = 0; j < N; j++) {
-      double dotprod = 0.0; /* Accumulates the sum of the dot-product */
-      for (k = 0; k < K; k++) {
+      // double dotprod = 0.0; /* Accumulates the sum of the dot-product */
+      double dotprod;
+      //A0 = _mm_setzero_pd();
+      A0 = _mm_set1_pd(0);
+
+      for (k = 0; k < K; k = k+4) {
         int a_index, b_index;
-        a_index = (i * K) + k; /* Compute index of A element */
-        b_index = (j * K) + k; /* Compute index of B element */
-        dotprod += A[a_index] * B[b_index]; /* Compute product of A and B */
+        a_index = (i * K) + k;
+        b_index = (j * K) + k;
+
+        X0 = _mm_load_pd(&A[a_index]);
+        Y0 = _mm_load_pd(&B[b_index]);
+
+        A1 = _mm_mul_pd(X0, Y0);
+        A0 = _mm_add_pd(A0, A1);
+
+        //
+
+        X0 = _mm_load_pd(&A[a_index+2]);
+        Y0 = _mm_load_pd(&B[b_index+2]);
+
+        A1 = _mm_mul_pd(X0, Y0);
+        A0 = _mm_add_pd(A0, A1);
+
+        //
+
+        /*
+        dotprod += A[a_index] * B[b_index];
+        dotprod += A[a_index+1] * B[b_index+1];
+        dotprod += A[a_index+2] * B[b_index+2];
+        dotprod += A[a_index+3] * B[b_index+3];
+        */
       }
       int c_index = (j * lda) + i;
-      C[c_index] = dotprod + C[c_index];
+      __declspec(align(16)) double prodResult[2];
+      _mm_store_pd(prodResult, A0);
+      C[c_index] = prodResult[0] + prodResult[1] + C[c_index];
     }
   }
 
@@ -116,7 +152,7 @@ matmult (const int lda, const double *A, const double *B, double *C)
 {
   int i;
 
-#pragma omp parallel for shared (lda,A,B,C) private (i)
+//#pragma omp parallel for shared (lda,A,B,C) private (i)
   for (i = 0; i < lda; i += M_BLOCK_SIZE) {
     int j;
     for (j = 0; j < lda; j += N_BLOCK_SIZE) {
