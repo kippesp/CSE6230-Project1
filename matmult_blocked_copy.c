@@ -60,75 +60,26 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
 
   for (i = 0; i < M; i++) {
     for (j = 0; j < N; j++) {
+      int a_index, b_index;
       __m128d A0;
+      __m128d X0;
+      __m128d X1;
+      __m128d X2;
+      __m128d X3;
+      __m128d X4;
+      __m128d Y0;
+      __m128d Y1;
+      __m128d Y2;
+      __m128d Y3;
+      __m128d Y4;
 
       A0 = _mm_setzero_pd();
 
-      for (k = 0; k < K; k = k+16)
-      {
-        int a_index, b_index;
-        __m128d X0;
-        __m128d X1;
-        __m128d X2;
-        __m128d X3;
-        __m128d X4;
-        __m128d Y0;
-        __m128d Y1;
-        __m128d Y2;
-        __m128d Y3;
-        __m128d Y4;
+      a_index = (i * K);
+      b_index = (j * K);
 
-        a_index = (i * K) + k;
-        b_index = (j * K) + k;
+#include "unwrapped.c"
 
-        X0 = _mm_load_pd(&A[a_index]);
-        Y0 = _mm_load_pd(&B[b_index]);
-        X0 = _mm_mul_pd(X0, Y0);
-        A0 = _mm_add_pd(A0, X0);
-
-        X1 = _mm_load_pd(&A[a_index+2]);
-        Y1 = _mm_load_pd(&B[b_index+2]);
-        X1 = _mm_mul_pd(X1, Y1);
-        A0 = _mm_add_pd(A0, X1);
-
-        X2 = _mm_load_pd(&A[a_index+4]);
-        Y2 = _mm_load_pd(&B[b_index+4]);
-        X2 = _mm_mul_pd(X2, Y2);
-        A0 = _mm_add_pd(A0, X2);
-
-        X3 = _mm_load_pd(&A[a_index+6]);
-        Y3 = _mm_load_pd(&B[b_index+6]);
-        X3 = _mm_mul_pd(X3, Y3);
-        A0 = _mm_add_pd(A0, X3);
-
-        X4 = _mm_load_pd(&A[a_index+8]);
-        Y4 = _mm_load_pd(&B[b_index+8]);
-        X4 = _mm_mul_pd(X4, Y4);
-        A0 = _mm_add_pd(A0, X4);
-
-
-
-
-        Y2 = _mm_load_pd(&A[a_index+10]);
-        Y3 = _mm_load_pd(&B[b_index+10]);
-        Y2 = _mm_mul_pd(Y2, Y3);
-        A0 = _mm_add_pd(A0, Y2);
-
-        X0 = _mm_load_pd(&A[a_index+12]);
-        X2 = _mm_load_pd(&B[b_index+12]);
-        X0 = _mm_mul_pd(X0, X2);
-        A0 = _mm_add_pd(A0, X0);
-
-        X1 = _mm_load_pd(&A[a_index+14]);
-        X3 = _mm_load_pd(&B[b_index+14]);
-
-        X1 = _mm_mul_pd(X1, X3);
-
-        // registers freed
-
-        A0 = _mm_add_pd(A0, X1);
-
-      }
       int c_index = (j * lda) + i;
       __declspec(align(16)) double prodResult[2];
 
