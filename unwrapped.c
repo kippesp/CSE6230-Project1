@@ -29,115 +29,114 @@
         A0 = _mm_add_pd(A0, X4);
 
         // Iteration 6
-        X0 = _mm_load_pd(&A[a_index+10]);
-        Y0 = _mm_load_pd(&B[b_index+10]);
-        X0 = _mm_mul_pd(X0, Y0);
-        A0 = _mm_add_pd(A0, X0);
+        X5 = _mm_load_pd(&A[a_index+10]);
+        Y5 = _mm_load_pd(&B[b_index+10]);
+        X5 = _mm_mul_pd(X5, Y5);
+        A0 = _mm_add_pd(A0, X5);
 
         // Iteration 7
-        X1 = _mm_load_pd(&A[a_index+12]);
-        Y1 = _mm_load_pd(&B[b_index+12]);
-        X1 = _mm_mul_pd(X1, Y1);
-        A0 = _mm_add_pd(A0, X1);
+        X0 = _mm_load_pd(&A[a_index+12]);
+        Y0 = _mm_load_pd(&B[b_index+12]);
+        X0 = _mm_mul_pd(X0, Y0);
+        A0 = _mm_add_pd(A0, X0);
 
         // Iteration 8
-        X2 = _mm_load_pd(&A[a_index+14]);
-        Y2 = _mm_load_pd(&B[b_index+14]);
-        X2 = _mm_mul_pd(X2, Y2);
-        A0 = _mm_add_pd(A0, X2);
+        X1 = _mm_load_pd(&A[a_index+14]);
+        Y1 = _mm_load_pd(&B[b_index+14]);
+        X1 = _mm_mul_pd(X1, Y1);
+        A0 = _mm_add_pd(A0, X1);
 
         // Iteration 9
-        X3 = _mm_load_pd(&A[a_index+16]);
-        Y3 = _mm_load_pd(&B[b_index+16]);
-        X3 = _mm_mul_pd(X3, Y3);
-        A0 = _mm_add_pd(A0, X3);
+        X2 = _mm_load_pd(&A[a_index+16]);
+        Y2 = _mm_load_pd(&B[b_index+16]);
+        X2 = _mm_mul_pd(X2, Y2);
+        A0 = _mm_add_pd(A0, X2);
 
         // Iteration 10
-        X4 = _mm_load_pd(&A[a_index+18]);
-        Y4 = _mm_load_pd(&B[b_index+18]);
-        X4 = _mm_mul_pd(X4, Y4);
-        A0 = _mm_add_pd(A0, X4);
+        X3 = _mm_load_pd(&A[a_index+18]);
+        Y3 = _mm_load_pd(&B[b_index+18]);
+        X3 = _mm_mul_pd(X3, Y3);
+        A0 = _mm_add_pd(A0, X3);
 
         // Iteration 11
-        X0 = _mm_load_pd(&A[a_index+20]);
-        Y0 = _mm_load_pd(&B[b_index+20]);
-        X0 = _mm_mul_pd(X0, Y0);
-        A0 = _mm_add_pd(A0, X0);
+        X4 = _mm_load_pd(&A[a_index+20]);
+        Y4 = _mm_load_pd(&B[b_index+20]);
+        X4 = _mm_mul_pd(X4, Y4);
+        A0 = _mm_add_pd(A0, X4);
 
         // Iteration 12
-        X1 = _mm_load_pd(&A[a_index+22]);
-        Y1 = _mm_load_pd(&B[b_index+22]);
-        X1 = _mm_mul_pd(X1, Y1);
-        A0 = _mm_add_pd(A0, X1);
+        X5 = _mm_load_pd(&A[a_index+22]);
+        Y5 = _mm_load_pd(&B[b_index+22]);
+        X5 = _mm_mul_pd(X5, Y5);
+        A0 = _mm_add_pd(A0, X5);
 
         // Iteration 13
-        X2 = _mm_load_pd(&A[a_index+24]);
-        Y2 = _mm_load_pd(&B[b_index+24]);
-        X2 = _mm_mul_pd(X2, Y2);
-        A0 = _mm_add_pd(A0, X2);
+        X0 = _mm_load_pd(&A[a_index+24]);
+        Y0 = _mm_load_pd(&B[b_index+24]);
+        X0 = _mm_mul_pd(X0, Y0);
+        A0 = _mm_add_pd(A0, X0);
 
         // Iteration 14
-        X3 = _mm_load_pd(&A[a_index+26]);
-        Y3 = _mm_load_pd(&B[b_index+26]);
-        X3 = _mm_mul_pd(X3, Y3);
-        A0 = _mm_add_pd(A0, X3);
+        X1 = _mm_load_pd(&A[a_index+26]);
+        Y1 = _mm_load_pd(&B[b_index+26]);
+        X1 = _mm_mul_pd(X1, Y1);
+        A0 = _mm_add_pd(A0, X1);
 
         // Iteration 15
-        X4 = _mm_load_pd(&A[a_index+28]);
-        Y4 = _mm_load_pd(&B[b_index+28]);
-        X4 = _mm_mul_pd(X4, Y4);
-        A0 = _mm_add_pd(A0, X4);
+        X2 = _mm_load_pd(&A[a_index+28]);
+        Y2 = _mm_load_pd(&B[b_index+28]);
+        X2 = _mm_mul_pd(X2, Y2);
+        A0 = _mm_add_pd(A0, X2);
 
         // Iteration 16
-        X0 = _mm_load_pd(&A[a_index+30]);
-        Y0 = _mm_load_pd(&B[b_index+30]);
-        X0 = _mm_mul_pd(X0, Y0);
-        A0 = _mm_add_pd(A0, X0);
-
-        // Iteration 17
-        X1 = _mm_load_pd(&A[a_index+32]);
-        Y1 = _mm_load_pd(&B[b_index+32]);
-        X1 = _mm_mul_pd(X1, Y1);
-        A0 = _mm_add_pd(A0, X1);
-
-        // Iteration 18
-        X2 = _mm_load_pd(&A[a_index+34]);
-        Y2 = _mm_load_pd(&B[b_index+34]);
-        X2 = _mm_mul_pd(X2, Y2);
-        A0 = _mm_add_pd(A0, X2);
-
-        // Iteration 19
-        X3 = _mm_load_pd(&A[a_index+36]);
-        Y3 = _mm_load_pd(&B[b_index+36]);
+        X3 = _mm_load_pd(&A[a_index+30]);
+        Y3 = _mm_load_pd(&B[b_index+30]);
         X3 = _mm_mul_pd(X3, Y3);
         A0 = _mm_add_pd(A0, X3);
 
-        // Iteration 20
-        X4 = _mm_load_pd(&A[a_index+38]);
-        Y4 = _mm_load_pd(&B[b_index+38]);
+        // Iteration 17
+        X4 = _mm_load_pd(&A[a_index+32]);
+        Y4 = _mm_load_pd(&B[b_index+32]);
         X4 = _mm_mul_pd(X4, Y4);
         A0 = _mm_add_pd(A0, X4);
 
-        // Iteration 21
-        X0 = _mm_load_pd(&A[a_index+40]);
-        Y0 = _mm_load_pd(&B[b_index+40]);
+        // Iteration 18
+        X5 = _mm_load_pd(&A[a_index+34]);
+        Y5 = _mm_load_pd(&B[b_index+34]);
+        X5 = _mm_mul_pd(X5, Y5);
+        A0 = _mm_add_pd(A0, X5);
+
+        // Iteration 19
+        X0 = _mm_load_pd(&A[a_index+36]);
+        Y0 = _mm_load_pd(&B[b_index+36]);
         X0 = _mm_mul_pd(X0, Y0);
         A0 = _mm_add_pd(A0, X0);
 
-        // Iteration 22
-        X1 = _mm_load_pd(&A[a_index+42]);
-        Y1 = _mm_load_pd(&B[b_index+42]);
+        // Iteration 20
+        X1 = _mm_load_pd(&A[a_index+38]);
+        Y1 = _mm_load_pd(&B[b_index+38]);
         X1 = _mm_mul_pd(X1, Y1);
         A0 = _mm_add_pd(A0, X1);
 
-        // Iteration 23
-        X2 = _mm_load_pd(&A[a_index+44]);
-        Y2 = _mm_load_pd(&B[b_index+44]);
+        // Iteration 21
+        X2 = _mm_load_pd(&A[a_index+40]);
+        Y2 = _mm_load_pd(&B[b_index+40]);
         X2 = _mm_mul_pd(X2, Y2);
         A0 = _mm_add_pd(A0, X2);
 
-        // Iteration 24
-        X3 = _mm_load_pd(&A[a_index+46]);
-        Y3 = _mm_load_pd(&B[b_index+46]);
+        // Iteration 22
+        X3 = _mm_load_pd(&A[a_index+42]);
+        Y3 = _mm_load_pd(&B[b_index+42]);
         X3 = _mm_mul_pd(X3, Y3);
         A0 = _mm_add_pd(A0, X3);
+        // Iteration 23
+        X0 = _mm_load_pd(&A[a_index+44]);
+        Y0 = _mm_load_pd(&B[b_index+44]);
+        X0 = _mm_mul_pd(X0, Y0);
+        A0 = _mm_add_pd(A0, X0);
+
+        // Iteration 24
+        X1 = _mm_load_pd(&A[a_index+46]);
+        Y1 = _mm_load_pd(&B[b_index+46]);
+        X1 = _mm_mul_pd(X1, Y1);
+        A0 = _mm_add_pd(A0, X1);

@@ -67,11 +67,13 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
       __m128d X2;
       __m128d X3;
       __m128d X4;
+      __m128d X5;
       __m128d Y0;
       __m128d Y1;
       __m128d Y2;
       __m128d Y3;
       __m128d Y4;
+      __m128d Y5;
 
       A0 = _mm_setzero_pd();
 
