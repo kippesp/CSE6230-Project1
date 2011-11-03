@@ -22,6 +22,7 @@ const int test_sizes[] = {
 #else
 const int test_sizes[] = {
   2016, 4032, 5184
+  //2048, 4096, 5120
  //3968, 4096, 4104, 4608, 5120 
 };
 #endif

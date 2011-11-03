@@ -56,38 +56,63 @@ static void print_matrix(int rows, int cols, const double *mat) {
 void
 basic_dgemm (const int lda, const int M, const int N, const int K, const double *A, const double *B, double *C)
 {
-  int i, j, k;
+  int i, j;
 
-  for (i = 0; i < M; i++) {
-    for (j = 0; j < N; j++) {
-      int a_index, b_index;
-      __m128d A0;
-      __m128d X0;
+  for (i = 0; i < M; i++)
+  {
+    for (j = 0; j < N; j=j+4)
+    {
+      __m128d A0; /* accumulators */
+      __m128d A1;
+      __m128d A2;
+      __m128d A3;
+
+      { /* begin scope A */
+      register int a_index_base = i*K_BLOCK_SIZE;
+      register int b_index_base = j*K_BLOCK_SIZE;
+
+      __m128d B0; /* accumulators */
+      __m128d B1;
+      __m128d B2;
+      __m128d B3;
+
+      __m128d X0; /* general purpose */
       __m128d X1;
-      __m128d X2;
-      __m128d X3;
-      __m128d X4;
-      __m128d X5;
-      __m128d Y0;
+
+      __m128d Y0; /* general purpose */
       __m128d Y1;
       __m128d Y2;
       __m128d Y3;
-      __m128d Y4;
-      __m128d Y5;
 
       A0 = _mm_setzero_pd();
+      A1 = _mm_setzero_pd();
+      A2 = _mm_setzero_pd();
+      A3 = _mm_setzero_pd();
 
-      a_index = (i * K);
-      b_index = (j * K);
-
-#include "unwrapped.c"
-
-      int c_index = (j * lda) + i;
-      __declspec(align(16)) double prodResult[2];
+#include "unwrapped-jam.c"
+      } /* end scope A */
 
       A0 = _mm_hadd_pd(A0, A0);
-      _mm_store_pd(prodResult, A0);
-      C[c_index] = prodResult[0] + C[c_index];
+      A1 = _mm_hadd_pd(A1, A1);
+      A2 = _mm_hadd_pd(A2, A2);
+      A3 = _mm_hadd_pd(A3, A3);
+
+      { /* begin scope B */
+
+      register int c_index_base = j * lda + i;
+      __declspec(align(16)) double prodResult[8];
+
+      _mm_store_pd(&prodResult[0], A0);
+      _mm_store_pd(&prodResult[2], A1);
+      _mm_store_pd(&prodResult[4], A2);
+      _mm_store_pd(&prodResult[6], A3);
+
+      C[c_index_base]         += prodResult[0];
+      C[c_index_base + lda]   += prodResult[2];
+      C[c_index_base + 2*lda] += prodResult[4];
+      C[c_index_base + 3*lda] += prodResult[6];
+
+      } /* end scope B */
     }
   }
 
