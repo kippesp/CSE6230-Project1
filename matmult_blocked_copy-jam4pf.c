@@ -56,17 +56,19 @@ static void print_matrix(int rows, int cols, const double *mat) {
  *
  */
 
+#define NUM_COLS 4
+
 void
 basic_dgemm (const int lda, const int M, const int N, const int K, const double *A, const double *B, double *C)
 {
   int i, j;
 
-  PREFETCH_T0(&A[0], 256);
-  PREFETCH_T0(&B[0], 256);
+  PREFETCH_T0(&A[0], K_BLOCK_SIZE*sizeof(double));
+  PREFETCH_T0(&B[0], K_BLOCK_SIZE*NUM_COLS/2*sizeof(double));
 
   for (i = 0; i < M; i++)
   {
-    for (j = 0; j < N; j=j+4)
+    for (j = 0; j < N; j=j+NUM_COLS)
     {
       __m128d A0; /* accumulators */
       __m128d A1;
@@ -96,6 +98,9 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
       A3 = _mm_setzero_pd();
 
 #include "unwrapped-jam4pf.c"
+
+      PREFETCH_T0(&A[a_index_base + K_BLOCK_SIZE], K_BLOCK_SIZE*sizeof(double));
+      PREFETCH_T0(&B[b_index_base + NUM_COLS*K_BLOCK_SIZE], K_BLOCK_SIZE*NUM_COLS/2*sizeof(double));
       } /* end scope A */
 
       A0 = _mm_hadd_pd(A0, A0);
