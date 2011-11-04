@@ -1,0 +1,24 @@
+
+
+**Validating matmult**
+	Validating n=128.....pass
+	Validating n=256.....pass
+	Validating n=2048.....pass
+
+
+**Timing matmult**
+	n=1024: 28.906543 gflops/s
+	n=2048: 42.759716 gflops/s
+	n=4096: 55.279446 gflops/s
+	n=5120: 48.678675 gflops/s
+	n=6400: 52.634546 gflops/s
+
+	n=1024: 42.791686 gflops/s
+	n=2048: 42.868778 gflops/s
+	n=4096: 55.652180 gflops/s
+	n=5120: 51.658295 gflops/s
+	n=6400: 52.504871 gflops/s
+
+
+
+Average Performance: 47.373474 gflops/s
