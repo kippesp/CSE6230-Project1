@@ -17,16 +17,16 @@ def method_1():
         $y3 = _mm_load_pd(&B[$b_index_base+$b_col_offset_3+$index1]);
         $b3 = _mm_mul_pd($x1, $y3);
         $a3 = _mm_add_pd($a3, $b3);
-    """
 
-        #//$y4 = _mm_load_pd(&B[$b_index_base+$b_col_offset_4+$index1]);
-        #//$b4 = _mm_mul_pd($x1, $y4);
-        #//$a4 = _mm_add_pd($a4, $b4);
+        $y4 = _mm_load_pd(&B[$b_index_base+$b_col_offset_4+$index1]);
+        $b4 = _mm_mul_pd($x1, $y4);
+        $a4 = _mm_add_pd($a4, $b4);
+    """
 
     t = Template(template.strip())
     #print t.substitute(x='X0', y='Y0', a='A0')
     iteration = 0
-    cols = 3
+    cols = 4
     for i in range(0, K/2, 1):
           print ' '*8 + t.substitute(
                   iteration1=i+1,

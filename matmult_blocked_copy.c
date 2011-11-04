@@ -22,9 +22,7 @@
  *
  **/
 
-#define K_BLOCK_SIZE 48
-#define M_BLOCK_SIZE 48
-#define N_BLOCK_SIZE 48
+#define BLOCK_SIZE 48
 
 #define MIN(a, b) (a < b) ? a : b
 
@@ -68,8 +66,8 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
       __m128d A3;
 
       { /* begin scope A */
-      register int a_index_base = i*K_BLOCK_SIZE;
-      register int b_index_base = j*K_BLOCK_SIZE;
+      register int a_index_base = i*BLOCK_SIZE;
+      register int b_index_base = j*BLOCK_SIZE;
 
       __m128d B0; /* accumulators */
       __m128d B1;
@@ -89,7 +87,7 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
       A2 = _mm_setzero_pd();
       A3 = _mm_setzero_pd();
 
-#include "unwrapped-jam.c"
+#include "unwrapped-jam4.c"
       } /* end scope A */
 
       A0 = _mm_hadd_pd(A0, A0);
@@ -136,8 +134,8 @@ dgemm_copy (const int lda, const int M, const int N, const int K, const double *
   //print_matrix(K, N, B);
 
   int i, j, k;
-  __declspec(align(16))double A_temp[K_BLOCK_SIZE * M_BLOCK_SIZE];
-  __declspec(align(16))double B_temp[K_BLOCK_SIZE * N_BLOCK_SIZE];
+  __declspec(align(16))double A_temp[BLOCK_SIZE * BLOCK_SIZE];
+  __declspec(align(16))double B_temp[BLOCK_SIZE * BLOCK_SIZE];
 
   /* Copy and transpose matrix A into cache */
   for (k = 0; k < K; k++) {
@@ -162,14 +160,14 @@ matmult (const int lda, const double *A, const double *B, double *C)
   int i;
 
 #pragma omp parallel for shared (lda,A,B,C) private (i)
-  for (i = 0; i < lda; i += M_BLOCK_SIZE) {
+  for (i = 0; i < lda; i += BLOCK_SIZE) {
     int j;
-    for (j = 0; j < lda; j += N_BLOCK_SIZE) {
+    for (j = 0; j < lda; j += BLOCK_SIZE) {
       int k;
-      for (k = 0; k < lda; k += K_BLOCK_SIZE) {
-        int M = MIN (M_BLOCK_SIZE, lda-i);
-        int N = MIN (N_BLOCK_SIZE, lda-j);
-        int K = MIN (K_BLOCK_SIZE, lda-k);
+      for (k = 0; k < lda; k += BLOCK_SIZE) {
+        int M = MIN (BLOCK_SIZE, lda-i);
+        int N = MIN (BLOCK_SIZE, lda-j);
+        int K = MIN (BLOCK_SIZE, lda-k);
 
         dgemm_copy (lda, M, N, K, A+i+k*lda, B+k+j*lda, C+i+j*lda);
       }
