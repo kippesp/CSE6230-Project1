@@ -95,7 +95,7 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
       A2 = _mm_setzero_pd();
       A3 = _mm_setzero_pd();
 
-#include "unwrapped-jam4.c"
+#include "unwrapped-jam4pf.c"
       } /* end scope A */
 
       A0 = _mm_hadd_pd(A0, A0);
