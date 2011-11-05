@@ -1,8 +1,7 @@
 from string import Template
+import sys
 
-K = 48
-
-def method_1():
+def method_1(K):
     template = """\
         // Iteration $iteration1
         $x1 = _mm_load_pd(&A[$a_index_base+$index1]);
@@ -62,4 +61,8 @@ def method_1():
 
 
 if __name__=='__main__':
-    method_1()
+    if len(sys.argv) > 1:
+        K = int(sys.argv[1])
+    else:
+        K = 48
+    method_1(K)
