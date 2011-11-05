@@ -57,14 +57,16 @@ static void print_matrix(int rows, int cols, const double *mat) {
  */
 
 #define NUM_COLS 4
+#define LARGE_BLOCK_SIZE 128
+#define PREFETCH_T0(addr,nrOfBytesAhead) _mm_prefetch(((char *)(addr))+nrOfBytesAhead,_MM_HINT_T0)
 
 void
-basic_dgemm (const int lda, const int M, const int N, const int K, const double *A, const double *B, double *C)
+basic_128_dgemm_pf (const int lda, const int M, const int N, const int K, const double *A, const double *B, double *C)
 {
   int i, j;
 
-  PREFETCH_T0(&A[0], K_BLOCK_SIZE*sizeof(double));
-  PREFETCH_T0(&B[0], K_BLOCK_SIZE*NUM_COLS/2*sizeof(double));
+  PREFETCH_T0(&A[0], LARGE_BLOCK_SIZE*sizeof(double));
+  PREFETCH_T0(&B[0], LARGE_BLOCK_SIZE*NUM_COLS/2*sizeof(double));
 
   for (i = 0; i < M; i++)
   {
@@ -76,8 +78,8 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
       __m128d A3;
 
       { /* begin scope A */
-      register int a_index_base = i*K_BLOCK_SIZE;
-      register int b_index_base = j*K_BLOCK_SIZE;
+      register int a_index_base = i*LARGE_BLOCK_SIZE;
+      register int b_index_base = j*LARGE_BLOCK_SIZE;
 
       __m128d B0; /* accumulators */
       __m128d B1;
@@ -97,10 +99,10 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
       A2 = _mm_setzero_pd();
       A3 = _mm_setzero_pd();
 
-#include "unwrapped-jam4pf.c"
+#include "unwrapped-jam4-128pf.c"
 
-      PREFETCH_T0(&A[a_index_base + K_BLOCK_SIZE], K_BLOCK_SIZE*sizeof(double));
-      PREFETCH_T0(&B[b_index_base + NUM_COLS*K_BLOCK_SIZE], K_BLOCK_SIZE*NUM_COLS/2*sizeof(double));
+      PREFETCH_T0(&A[a_index_base + LARGE_BLOCK_SIZE], LARGE_BLOCK_SIZE*sizeof(double));
+      PREFETCH_T0(&B[b_index_base + NUM_COLS*LARGE_BLOCK_SIZE], LARGE_BLOCK_SIZE*NUM_COLS/2*sizeof(double));
       } /* end scope A */
 
       A0 = _mm_hadd_pd(A0, A0);
@@ -126,15 +128,6 @@ basic_dgemm (const int lda, const int M, const int N, const int K, const double 
       } /* end scope B */
     }
   }
-
-  //puts("A_temp=");
-  //print_matrix(M, K, A_temp);
-
-  //puts("B_temp=");
-  //print_matrix(K, N, B_temp);
-
-  //puts("C=");
-  //print_matrix(M, N, C);
 }
 
 void

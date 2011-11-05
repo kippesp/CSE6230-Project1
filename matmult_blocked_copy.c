@@ -27,21 +27,6 @@
 
 #define MIN(a, b) (a < b) ? a : b
 
-static void print_matrix(int rows, int cols, const double *mat) {
-
-  int r, c;
-
-  /* Iterate over the rows of the matrix */
-  for (r = 0; r < rows; r++) {
-    /* Iterate over the columns of the matrix */
-    for (c = 0; c < cols; c++) {
-      int index = (c * rows) + r;
-      fprintf(stderr, "%.0lf ", mat[index]);
-    } /* c */
-    fprintf(stderr, "\n");
-  } /* r */
-}
-
 void
 basic_dgemm (const int lda, const int M, const int N, const int K, const double *A, const double *B, double *C)
 {
@@ -135,15 +120,6 @@ basic_48_dgemm (const int lda, const int M, const int N, const int K,
       } /* end scope B */
     }
   }
-
-  //puts("A_temp=");
-  //print_matrix(M, K, A_temp);
-
-  //puts("B_temp=");
-  //print_matrix(K, N, B_temp);
-
-  //puts("C=");
-  //print_matrix(M, N, C);
 }
 
 void
@@ -209,15 +185,6 @@ basic_40_dgemm (const int lda, const int M, const int N, const int K,
       } /* end scope B */
     }
   }
-
-  //puts("A_temp=");
-  //print_matrix(M, K, A_temp);
-
-  //puts("B_temp=");
-  //print_matrix(K, N, B_temp);
-
-  //puts("C=");
-  //print_matrix(M, N, C);
 }
 
 void
@@ -283,15 +250,6 @@ basic_32_dgemm (const int lda, const int M, const int N, const int K,
       } /* end scope B */
     }
   }
-
-  //puts("A_temp=");
-  //print_matrix(M, K, A_temp);
-
-  //puts("B_temp=");
-  //print_matrix(K, N, B_temp);
-
-  //puts("C=");
-  //print_matrix(M, N, C);
 }
 
 void
@@ -357,15 +315,6 @@ basic_24_dgemm (const int lda, const int M, const int N, const int K,
       } /* end scope B */
     }
   }
-
-  //puts("A_temp=");
-  //print_matrix(M, K, A_temp);
-
-  //puts("B_temp=");
-  //print_matrix(K, N, B_temp);
-
-  //puts("C=");
-  //print_matrix(M, N, C);
 }
 
 void
@@ -431,15 +380,6 @@ basic_22_dgemm (const int lda, const int M, const int N, const int K,
       } /* end scope B */
     }
   }
-
-  //puts("A_temp=");
-  //print_matrix(M, K, A_temp);
-
-  //puts("B_temp=");
-  //print_matrix(K, N, B_temp);
-
-  //puts("C=");
-  //print_matrix(M, N, C);
 }
 
 void
@@ -505,15 +445,6 @@ basic_16_dgemm (const int lda, const int M, const int N, const int K,
       } /* end scope B */
     }
   }
-
-  //puts("A_temp=");
-  //print_matrix(M, K, A_temp);
-
-  //puts("B_temp=");
-  //print_matrix(K, N, B_temp);
-
-  //puts("C=");
-  //print_matrix(M, N, C);
 }
 
 void
@@ -579,26 +510,11 @@ basic_8_dgemm (const int lda, const int M, const int N, const int K,
       } /* end scope B */
     }
   }
-
-  //puts("A_temp=");
-  //print_matrix(M, K, A_temp);
-
-  //puts("B_temp=");
-  //print_matrix(K, N, B_temp);
-
-  //puts("C=");
-  //print_matrix(M, N, C);
 }
 
 void
 dgemm_copy (const int lda, const int M, const int N, const int K, const double *A, const double *B, double *C)
 {
-  //puts("A=");
-  //print_matrix(M, K, A);
-
-  //puts("B=");
-  //print_matrix(K, N, B);
-
   int i, j, k;
   __declspec(align(16))double A_temp[BLOCK_SIZE_48 * BLOCK_SIZE_48];
   __declspec(align(16))double B_temp[BLOCK_SIZE_48 * BLOCK_SIZE_48];
@@ -652,22 +568,147 @@ dgemm_copy (const int lda, const int M, const int N, const int K, const double *
   }
 }
 
+
+/*********************************************************************************
+                                 SPECIAL CASE
+   basic_128_dgemm_pf is a special case for matrices that perform poorly with the
+   above functions: 4096, 4608, 5120.
+*********************************************************************************/
+
+#define NUM_COLS 4
+#define LARGE_BLOCK_SIZE 128
+#define PREFETCH_T0(addr,nrOfBytesAhead) _mm_prefetch(((char *)(addr))+nrOfBytesAhead,_MM_HINT_T0)
+
+void
+basic_128_dgemm_pf (const int lda, const int M, const int N, const int K, const double *A, const double *B, double *C)
+{
+  int i, j;
+
+  PREFETCH_T0(&A[0], LARGE_BLOCK_SIZE*sizeof(double));
+  PREFETCH_T0(&B[0], LARGE_BLOCK_SIZE*NUM_COLS/2*sizeof(double));
+
+  for (i = 0; i < M; i++)
+  {
+    for (j = 0; j < N; j=j+NUM_COLS)
+    {
+      __m128d A0; /* accumulators */
+      __m128d A1;
+      __m128d A2;
+      __m128d A3;
+
+      { /* begin scope A */
+      register int a_index_base = i*LARGE_BLOCK_SIZE;
+      register int b_index_base = j*LARGE_BLOCK_SIZE;
+
+      __m128d B0; /* accumulators */
+      __m128d B1;
+      __m128d B2;
+      __m128d B3;
+
+      __m128d X0; /* general purpose */
+      __m128d X1;
+
+      __m128d Y0; /* general purpose */
+      __m128d Y1;
+      __m128d Y2;
+      __m128d Y3;
+
+      A0 = _mm_setzero_pd();
+      A1 = _mm_setzero_pd();
+      A2 = _mm_setzero_pd();
+      A3 = _mm_setzero_pd();
+
+#include "unwrapped-jam4-128pf.c"
+
+      PREFETCH_T0(&A[a_index_base + LARGE_BLOCK_SIZE], LARGE_BLOCK_SIZE*sizeof(double));
+      PREFETCH_T0(&B[b_index_base + NUM_COLS*LARGE_BLOCK_SIZE], LARGE_BLOCK_SIZE*NUM_COLS/2*sizeof(double));
+      } /* end scope A */
+
+      A0 = _mm_hadd_pd(A0, A0);
+      A1 = _mm_hadd_pd(A1, A1);
+      A2 = _mm_hadd_pd(A2, A2);
+      A3 = _mm_hadd_pd(A3, A3);
+
+      { /* begin scope B */
+
+      register int c_index_base = j * lda + i;
+      __declspec(align(16)) double prodResult[8];
+
+      _mm_store_pd(&prodResult[0], A0);
+      _mm_store_pd(&prodResult[2], A1);
+      _mm_store_pd(&prodResult[4], A2);
+      _mm_store_pd(&prodResult[6], A3);
+
+      C[c_index_base]         += prodResult[0];
+      C[c_index_base + lda]   += prodResult[2];
+      C[c_index_base + 2*lda] += prodResult[4];
+      C[c_index_base + 3*lda] += prodResult[6];
+
+      } /* end scope B */
+    }
+  }
+}
+
+void
+dgemm_copy_pf (const int lda, const int M, const int N, const int K, const double *A, const double *B, double *C)
+{
+  int i, j, k;
+  __declspec(align(16))double A_temp[LARGE_BLOCK_SIZE * LARGE_BLOCK_SIZE];
+  __declspec(align(16))double B_temp[LARGE_BLOCK_SIZE * LARGE_BLOCK_SIZE];
+
+  /* Copy and transpose matrix A into cache */
+  for (k = 0; k < K; k++) {
+    for (i = 0; i < M; i++) {
+      A_temp[k + i*K] = A[i + k*lda];
+    }
+  }
+
+  /* Copy matrix B into cache */
+  for (j = 0; j < N; j++) {
+    for (k = 0; k < K; k++) {
+      B_temp[k + j*K] = B[k + j*lda];
+    }
+  }
+
+  basic_128_dgemm_pf (lda, M, N, K, A_temp, B_temp, C);
+}
+
 void
 matmult (const int lda, const double *A, const double *B, double *C)
 {
   int i;
 
+  if ((lda == 4096) || (lda == 4608) || (lda == 5120))
+  {
 #pragma omp parallel for shared (lda,A,B,C) private (i)
-  for (i = 0; i < lda; i += BLOCK_SIZE_48) {
-    int j;
-    for (j = 0; j < lda; j += BLOCK_SIZE_48) {
-      int k;
-      for (k = 0; k < lda; k += BLOCK_SIZE_48) {
-        int M = MIN (BLOCK_SIZE_48, lda-i);
-        int N = MIN (BLOCK_SIZE_48, lda-j);
-        int K = MIN (BLOCK_SIZE_48, lda-k);
+    for (i = 0; i < lda; i += LARGE_BLOCK_SIZE) {
+      int j;
+      for (j = 0; j < lda; j += LARGE_BLOCK_SIZE) {
+        int k;
+        for (k = 0; k < lda; k += LARGE_BLOCK_SIZE) {
+          int M = MIN (LARGE_BLOCK_SIZE, lda-i);
+          int N = MIN (LARGE_BLOCK_SIZE, lda-j);
+          int K = MIN (LARGE_BLOCK_SIZE, lda-k);
 
-        dgemm_copy (lda, M, N, K, A+i+k*lda, B+k+j*lda, C+i+j*lda);
+          dgemm_copy_pf (lda, M, N, K, A+i+k*lda, B+k+j*lda, C+i+j*lda);
+        }
+      }
+    }
+  }
+  else
+  {
+#pragma omp parallel for shared (lda,A,B,C) private (i)
+    for (i = 0; i < lda; i += BLOCK_SIZE_48) {
+      int j;
+      for (j = 0; j < lda; j += BLOCK_SIZE_48) {
+        int k;
+        for (k = 0; k < lda; k += BLOCK_SIZE_48) {
+          int M = MIN (BLOCK_SIZE_48, lda-i);
+          int N = MIN (BLOCK_SIZE_48, lda-j);
+          int K = MIN (BLOCK_SIZE_48, lda-k);
+
+          dgemm_copy (lda, M, N, K, A+i+k*lda, B+k+j*lda, C+i+j*lda);
+        }
       }
     }
   }

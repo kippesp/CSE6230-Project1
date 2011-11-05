@@ -36,7 +36,7 @@ def method_1():
           if i == 0:
             comment='// Prefetch mid-way-through B columns'
             lookahead = lookahead + 32
-            prefetch_b='PREFETCH_T0(&B[b_index_base+%d], K_BLOCK_SIZE*NUM_COLS/2*sizeof(double));' % (K/2)
+            prefetch_b='PREFETCH_T0(&B[b_index_base+%d], LARGE_BLOCK_SIZE*NUM_COLS/2*sizeof(double));' % (K/2)
           else:
             comment=''
             prefetch_b=''
