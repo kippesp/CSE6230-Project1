@@ -555,6 +555,7 @@ dgemm_copy (const int lda, const int M, const int N, const int K, const double *
   }
   else if (K==16)
   {
+    /* This function trashes performance 2048 and 4096 cases */
     basic_16_dgemm (lda, M, N, K, A_temp, B_temp, C);
   }
   else if (K==8)
@@ -678,7 +679,11 @@ matmult (const int lda, const double *A, const double *B, double *C)
 {
   int i;
 
-  if ((lda == 4096) || (lda == 4608) || (lda == 5120))
+  if (
+      (lda == 4096) ||
+      (lda == 4608) ||
+      (lda == 5120)
+      )
   {
 #pragma omp parallel for shared (lda,A,B,C) private (i)
     for (i = 0; i < lda; i += LARGE_BLOCK_SIZE) {
