@@ -10,11 +10,13 @@ LINK_MKL_GCC = -L/opt/intel/Compiler/11.1/059/mkl/lib/em64t/ \
 LINK_OPENMP_ICC = -openmp
 LINK_MKL_ICC = -L/opt/intel/Compiler/11.1/059/mkl/lib/em64t/ \
 	-Wl,-R/opt/intel/Compiler/11.1/059/mkl/lib/em64t/  -lmkl_lapack \
-	-lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm
+	-lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread -lm \
+	-auto-ilp32 -align -unroll-agressive
 
 
 CC = icc
 CFLAGS = -O2 -lm -lrt $(LINK_FORTRAN) $(LINK_MKL_ICC) $(LINK_OPENMP_ICC)
+#CFLAGS = -g -O0 -lm -lrt $(LINK_FORTRAN) $(LINK_MKL_ICC) $(LINK_OPENMP_ICC)
 
 FC = ifort
 FFLAGS = -O2 $(MKL_ICC) $(OPENMP_ICC)

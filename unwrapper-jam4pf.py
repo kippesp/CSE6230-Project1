@@ -33,7 +33,7 @@ def method_1():
     lookahead = 0
     for i in range(0, K/2, 1):
           #if i*2 % 32 == 0:
-          if i == 0:
+          if i == 30:
             comment='// Prefetch mid-way-through B columns'
             lookahead = lookahead + 32
             prefetch_b='PREFETCH_T0(&B[b_index_base+%d], LARGE_BLOCK_SIZE*NUM_COLS/2*sizeof(double));' % (K/2)
